@@ -1,14 +1,30 @@
+import csv
 
-class dependency_structure:
-    def __init__(self, raw_sentences):
-        # TODO split sentences, find out what the delimiter is
-        # currently assumes that raw_sentences is a list of sentences, each of which is raw text delimited by newline characters
-        # assumes dependency structure is the same as used by the EmoryNLP group (github.com/emorynlp)
-        self.sentences = [Sentence(raw_sentence) for raw_sentence in raw_sentences]
+class Dependency_Structure:
+    def __init__(self, file_name):
+        # accepts name of tsv file containing dependency parsed corpus
+        # track whether the current word (row) is the start of a new sentence
+        last_index = -1
+        # structure to hold sentence objects after processing
+        self.sentences = []
+        # chunk is a list of the words in the current sentence
+        chunk = []
+        with open(file_name, "r") as tsv_in:
+            tsv_in = csv.reader(tsv_in, delimiter = '\t')
+            for row in tsv_in:
+                if int(row[0]) > last_index:
+                    last_index = int(row[0])
+                    chunk.append(row)
+                else:
+                    self.sentences.append(Sentence(chunk))
+                    last_index = int(row[0])
+                    chunk = [row]
+            if chunk:
+                self.sentences.append(Sentence(chunk))
 
 class Sentence:
     def __init__(self, raw_text)
-        sentence = [term.split(' ') for term in raw_sent for raw_sent in raw_text.splitlines()]
+        sentence = [term.split('\t') for term in raw_text]
         nodes = [Node() for i in range(0, len(sentence)]
         for i, term in enumerate(sentence):
             n = nodes[i]
