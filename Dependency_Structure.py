@@ -21,6 +21,9 @@ class Dependency_Structure:
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
+    def get_sentences(self):
+        return self.sentences
+
 
 class Sentence:
     def __init__(self, raw_text)
