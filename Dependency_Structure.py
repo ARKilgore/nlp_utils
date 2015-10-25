@@ -1,5 +1,9 @@
 import csv
 
+# Usage: Pass a file name to initialize Dependency_Structure with sentences. 
+# Sentences (node-based structure) can be accessed through Dependency_Structure.
+# Most functionality to examine specfic structure and relations will happen at this level.
+
 class Dependency_Structure:
     def __init__(self, file_name):
         # accepts name of tsv file containing dependency parsed corpus
@@ -21,6 +25,7 @@ class Dependency_Structure:
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
+
     def get_sentences(self):
         return self.sentences
 
@@ -45,6 +50,9 @@ class Sentence:
         if self.nodes[i].get_head_index() is -1:
             return []
         return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
+
+    def get_token_list(self):
+        return [word.get_form() for word in self.nodes]
 
     def get_adjacency_context(self, which, window=-1):
         if window < 0:
