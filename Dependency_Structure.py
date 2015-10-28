@@ -5,7 +5,7 @@ import csv
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def __init__(self, file_name):
+    def __init__(self, file_name, limit=None):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
         last_index = -1
@@ -16,6 +16,8 @@ class Dependency_Structure:
         with open(file_name, "r") as tsv_in:
             tsv_in = csv.reader(tsv_in, delimiter = '\t')
             for row in tsv_in:
+                if limit and len(self.sentences) > limit:
+                    break
                 if int(row[0]) > last_index:
                     last_index = int(row[0])
                     chunk.append(row)
