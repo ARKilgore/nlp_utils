@@ -33,13 +33,13 @@ class Dependency_Structure:
 
 
 class Sentence:
-    def __init__(self, raw_text)
-        sentence = [term.split('\t') for term in raw_text]
-        nodes = [Node() for i in range(0, len(sentence)]
+    def __init__(self, sentence):
+#        sentence = [term.split('\t') for term in raw_text]
+        nodes = [Node() for i in range(0, len(sentence))]
         for i, term in enumerate(sentence):
             n = nodes[i]
             n.set_form(term[1])
-            n.set_head(term[5], term[6]) # not sure whether to use malt or stanford, this is malt
+            n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
             
             h = nodes[n.head]
             h.add_dep(i, n.arc)
@@ -63,7 +63,7 @@ class Sentence:
             context_words = []
             for i in range(window, which+window):
                 if i > -1 and i is not which and i < len(self.nodes):
-                    context_words.append[self.nodes[i]
+                    context_words.append[self.nodes[i]]
             return context_words
 
     def get_dependency_context(self, which, window=-1):
