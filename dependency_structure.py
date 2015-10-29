@@ -40,7 +40,7 @@ class Dependency_Structure:
 class Sentence:
     def __init__(self, sentence):
 #        sentence = [term.split('\t') for term in raw_text]
-        nodes = [Node() for i in range(0, len(sentence))]
+        nodes = [Node() for i in range(0, len(sentence) + 1)]
         for i, term in enumerate(sentence):
             n = nodes[i]
             n.set_form(term[1])
@@ -76,7 +76,9 @@ class Sentence:
 
     def get_dependency_context(self, which, window=-1):
         # temporary filler
-        return get_head(which)
+        context = [self.nodes[which], self.get_head(which)]
+        context.extend(self.get_siblings(which))
+        return context
 
 class Node:
     def __init__(self):
