@@ -31,6 +31,11 @@ class Dependency_Structure:
     def get_sentences(self):
         return self.sentences
 
+    def get_tokenized_sentences(self):
+        if not self.tokenized_sentences:
+            self.tokenized_sentences = [s.get_token_list() for s in self.sentences]
+        return self.tokenized_sentences
+
 
 class Sentence:
     def __init__(self, sentence):
@@ -55,6 +60,9 @@ class Sentence:
 
     def get_token_list(self):
         return [word.get_form() for word in self.nodes]
+
+    def get_context(self):
+        return get_token_list()
 
     def get_adjacency_context(self, which, window=-1):
         if window < 0:
