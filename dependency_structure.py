@@ -42,7 +42,7 @@ class Sentence:
 #        sentence = [term.split('\t') for term in raw_text]
         nodes = [Node() for i in range(0, len(sentence) + 1)]
         for i, term in enumerate(sentence):
-            n = nodes[i]
+            n = nodes[i + 1]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
             
