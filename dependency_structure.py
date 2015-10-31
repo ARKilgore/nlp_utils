@@ -1,6 +1,6 @@
 import csv
 
-# Usage: Pass a file name to initialize Dependency_Structure with sentences. 
+# Usage: Pass a file name to initialize Dependency_Structure with sentences.
 # Sentences (node-based structure) can be accessed through Dependency_Structure.
 # Most functionality to examine specfic structure and relations will happen at this level.
 
@@ -14,8 +14,13 @@ class Dependency_Structure:
         # chunk is a list of the words in the current sentence
         chunk = []
         with open(file_name, "r") as tsv_in:
-            tsv_in = csv.reader(tsv_in, delimiter = '\t')
+            tsv_in = csv.reader(tsv_in, delimiter = '\t', quoting=csv.QUOTE_NONE)
             for row in tsv_in:
+                if not row:
+                    self.sentences.append(Sentence(chunk))
+                    chunk = []
+                    last_index = -1
+                    continue
                 if limit and len(self.sentences) > limit:
                     break
                 if int(row[0]) > last_index:
@@ -23,7 +28,7 @@ class Dependency_Structure:
                     chunk.append(row)
                 else:
                     self.sentences.append(Sentence(chunk))
-                    last_index = int(row[0])
+                    last_index = -1
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
@@ -45,10 +50,11 @@ class Sentence:
             n = nodes[i + 1]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
-            
+            print n.head
             h = nodes[n.head]
             h.add_dep(i, n.arc)
         self.nodes = nodes
+        print 'Completed sentence: ', self.get_token_list()
 
     def get_head(self, index):
         return self.nodes[self.nodes[index].get_head_index()]
@@ -86,7 +92,7 @@ class Node:
         self.arc = None
         self.form = None
         self.dep = []
-    
+
     def set_form(self, form):
         self.form = form
 
@@ -102,10 +108,9 @@ class Node:
 
     def get_head_index():
         return self.head
-        
+
     def get_head_arc():
         return self.arc
 
     def get_dep_list():
         return self.dep
-        
