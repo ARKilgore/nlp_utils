@@ -30,8 +30,8 @@ class Dependency_Structure:
                     self.sentences.append(Sentence(chunk))
                     last_index = -1
                     chunk = [row]
-            if chunk:
-                self.sentences.append(Sentence(chunk))
+        if chunk:
+            self.sentences.append(Sentence(chunk))
 
     def get_sentences(self):
         return self.sentences
@@ -44,7 +44,6 @@ class Dependency_Structure:
 
 class Sentence:
     def __init__(self, sentence):
-#        sentence = [term.split('\t') for term in raw_text]
         nodes = [Node() for i in range(0, len(sentence) + 1)]
         for i, term in enumerate(sentence):
             n = nodes[i + 1]
@@ -60,15 +59,19 @@ class Sentence:
         return self.nodes[self.nodes[index].get_head_index()]
 
     def get_siblings(self, index):
-        if self.nodes[i].get_head_index() is -1:
+        if self.nodes[i].get_head_index() is None:
             return []
         return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
 
     def get_token_list(self):
-        return [word.get_form() for word in self.nodes]
+        if not self.token_list:
+            self.token_list = [word.get_form() for word in self.nodes]
+        return self.token_list
 
     def get_context(self):
         return get_token_list()
+
+# Context getters do not return the node which is used as reference ('which'), just its context
 
     def get_adjacency_context(self, which, window=-1):
         if window < 0:
@@ -82,8 +85,11 @@ class Sentence:
 
     def get_dependency_context(self, which, window=-1):
         # temporary filler
-        context = [self.nodes[which], self.get_head(which)]
+        context = []
+        # dependency features
+        context.append(self.get_head(which))
         context.extend(self.get_siblings(which))
+        
         return context
 
 class Node:
