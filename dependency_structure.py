@@ -1,6 +1,8 @@
 import csv
 
-# Usage: Pass a file name to initialize Dependency_Structure with sentences. 
+"""Loads dependency structure from file, give object-oriented representations"""
+
+# Usage: Pass a file name to initialize Dependency_Structure with sentences.
 # Sentences (node-based structure) can be accessed through Dependency_Structure.
 # Most functionality to examine specfic structure and relations will happen at this level.
 
@@ -16,6 +18,12 @@ class Dependency_Structure:
         with open(file_name, "r") as tsv_in:
 	    tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
             for row in tsv_in:
+                if not row:
+                    if chunk:
+                        self.sentences.append(Sentence(chunk))
+                        chunk = []
+                    last_index = -1
+                    continue
                 if limit and len(self.sentences) > limit:
                     break
 		if not row:
@@ -79,7 +87,12 @@ class Sentence:
 
     def get_dependency_context(self, which, window=-1):
         # temporary filler
-        return get_head(which)
+        context = []
+        # dependency features
+        context.append(self.get_head(which))
+        context.extend(self.get_siblings(which))
+
+        return context
 
 class Node:
     def __init__(self):
