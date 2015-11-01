@@ -66,7 +66,6 @@ class Sentence:
 		h = nodes[n.head]
             h.add_dep(i, n.arc)
         self.nodes = nodes
-	print self.get_token_list()
 
     def get_head(self, index):
         return self.nodes[self.nodes[index].get_head_index()]
