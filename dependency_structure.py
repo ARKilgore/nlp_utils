@@ -7,7 +7,7 @@ import csv
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def __init__(self, file_name, limit=None):
+    def __init__(self, file_name, limit=None, stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
         last_index = -1
@@ -39,30 +39,34 @@ class Dependency_Structure:
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
+        print 'Created ', len(self.sentences), ' sentences'
 
     def get_sentences(self):
         return self.sentences
 
 
 class Sentence:
-    def __init__(self, sentence):
-	for s in sentence:
-	    print s
+    def __init__(self, sentence, stop_words=[]):
+	self.token_list = None
+	self.nodes = None
+	#for s in sentence:
 #        sentence = [term.split('\t') for term in raw_text]
         nodes = [Node() for i in range(0, len(sentence))]
         for i, term in enumerate(sentence):
-	    print i
 #	    if term[5] == 'punct':
 #		del nodes[i]
 #		continue # should be end of sentence
+	    if term[1] in stop_words:
+		nodes.remove(nodes[i])
+		continue
             n = nodes[i]
             n.set_form(term[1])
-	    print 'think head is ', term[5]
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
             if n.head > 0:
 		h = nodes[n.head]
             h.add_dep(i, n.arc)
         self.nodes = nodes
+	print self.get_token_list()
 
     def get_head(self, index):
         return self.nodes[self.nodes[index].get_head_index()]
@@ -73,7 +77,9 @@ class Sentence:
         return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
 
     def get_token_list(self):
-        return [word.get_form() for word in self.nodes]
+	if not self.token_list:
+	    self.token_list = [word.get_form().lower() for word in self.nodes]
+	return self.token_list
 
     def get_adjacency_context(self, which, window=-1):
         if window < 0:
@@ -108,18 +114,18 @@ class Node:
         self.head = head
         self.arc = arc
 
-    def get_form():
+    def get_form(self):
         return self.form
 
     def add_dep(self, index, arc_type):
         self.dep.append((index, arc_type))
 
-    def get_head_index():
+    def get_head_index(self):
         return self.head
         
-    def get_head_arc():
+    def get_head_arc(self):
         return self.arc
 
-    def get_dep_list():
+    def get_dep_list(self):
         return self.dep
         
