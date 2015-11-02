@@ -58,7 +58,7 @@ class Sentence:
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
             if n.head >= len(nodes):
-                print 'ERROR ', i, n.form
+                print 'ERROR ', i, n.head, n.form
                 print sentence
             else:
                 h = nodes[n.head]
