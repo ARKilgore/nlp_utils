@@ -49,7 +49,9 @@ class Sentence:
     def __init__(self, sentence):
         nodes = [Node() for i in range(0, len(sentence) + 1)]
         for i, term in enumerate(sentence):
-            n = nodes[i + 1]
+            if i == 0:
+                continue
+            n = nodes[i]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
             print n.head
