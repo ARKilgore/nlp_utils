@@ -61,6 +61,7 @@ class Sentence:
             n = nodes[i]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
+            print 'at node', i
             if n.head > 0:
 		h = nodes[n.head]
             h.add_dep(i, n.arc)
