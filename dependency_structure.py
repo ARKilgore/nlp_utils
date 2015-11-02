@@ -47,7 +47,8 @@ class Sentence:
 	self.nodes = None
 	#for s in sentence:
 #        sentence = [term.split('\t') for term in raw_text]
-        nodes = [Node() for i in range(0, len(sentence))]
+        nodes = [Node()]
+        nodes.extend([Node() for i in range(0, len(sentence))])
         for i, term in enumerate(sentence):
             if i == 0:
                 continue
