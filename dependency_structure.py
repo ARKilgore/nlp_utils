@@ -26,11 +26,7 @@ class Dependency_Structure:
                     continue
                 if limit and len(self.sentences) > limit:
                     break
-		if not row:
-                    self.sentences.append(Sentence(chunk))
-                    last_index = -1
-                    chunk = []
-                elif row and int(row[0]) > last_index:
+                if row and int(row[0]) > last_index:
                     last_index = int(row[0])
                     chunk.append(row)
                 else:
@@ -61,8 +57,11 @@ class Sentence:
             n = nodes[i]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
-            print 'at node', i
-            h = nodes[n.head]
+            if n.head >= len(nodes):
+                print 'ERROR ', i, n.form
+                print sentence
+            else:
+                h = nodes[n.head]
             h.add_dep(i, n.arc)
         self.nodes = nodes
 
