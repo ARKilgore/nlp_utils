@@ -79,7 +79,7 @@ class Sentence:
 
     def get_token_list(self):
 	if not self.token_list:
-	    self.token_list = [word.get_form().lower() for word in self.nodes]
+	    self.token_list = [word.get_form().lower() for word in self.nodes if word]
 	return self.token_list
 
     def get_adjacency_context(self, which, window=-1):
