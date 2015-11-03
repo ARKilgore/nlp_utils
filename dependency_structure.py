@@ -37,6 +37,9 @@ class Dependency_Structure:
                 self.sentences.append(Sentence(chunk))
         print 'Created ', len(self.sentences), ' sentences'
 
+    def get_tokenized_sentences(self):
+        return [a.get_token_list() for a in self.sentences]
+
     def get_sentences(self):
         return self.sentences
 
