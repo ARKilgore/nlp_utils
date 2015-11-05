@@ -43,6 +43,10 @@ class Dependency_Structure:
     def get_sentences(self):
         return self.sentences
 
+    def combine(self, ds):
+        self.sentences = self.get_sentences() + ds.get_sentences()
+        return self
+
 
 class Sentence:
     def __init__(self, sentence, stop_words=[]):
