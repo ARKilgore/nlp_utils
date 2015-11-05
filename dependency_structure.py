@@ -114,7 +114,7 @@ class Node:
     def set_form(self, form):
         self.form = form
 
-    def set_pos(pos):
+    def set_pos(self, pos):
         self.pos = pos
 
     def set_head(self, head, arc): 
