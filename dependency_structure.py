@@ -60,7 +60,9 @@ class Sentence:
 		continue
             n = nodes[i]
             n.set_form(term[1])
-            n.set_head(int(term[5]), term[6]) # not sure whether to use malt or stanford, this is malt
+            n.set_head(int(term[5]), term[6]) 
+            n.set_pos(term[3])
+
             if n.head >= len(nodes):
                 print 'ERROR ', i, n.head, n.form
                 print sentence
@@ -106,12 +108,17 @@ class Node:
         self.head = None
         self.arc = None
         self.form = None
+        self.pos = None
         self.dep = []
     
     def set_form(self, form):
         self.form = form
 
-    def set_head(self, head, arc):
+    def set_pos(pos):
+        self.pos = pos
+
+    def set_head(self, head, arc): 
+        #sets head INDEX not pointer to head
         self.head = head
         self.arc = arc
 
