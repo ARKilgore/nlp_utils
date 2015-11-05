@@ -136,4 +136,9 @@ class Node:
 
     def get_dep_list(self):
         return self.dep
-        
+    
+    def is_verb(self):
+        if self.pos and self.pos[0].lower() == 'v':
+            return True
+        else:
+            return False
