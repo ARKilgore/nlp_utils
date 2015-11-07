@@ -106,7 +106,10 @@ class Sentence:
 
     def get_token_list(self):
 	if not self.token_list:
-	    self.token_list = [word.get_form().lower() for word in self.nodes if word.get_form()]
+	    self.token_list = []
+	    for i, word in enumerate(self.nodes):
+		if i != 0 and word.get_form() != None:
+		    self.token_list.append(word.get_form().lower())
 	return self.token_list
 
     def get_adjacency_context(self, which, window=-1):
@@ -127,6 +130,9 @@ class Sentence:
         context.extend(self.get_siblings(which))
 
         return context
+
+    def get_nodes_nohead(self):
+ 	return self.nodes[1:]
 
 class Node:
     def __init__(self):
