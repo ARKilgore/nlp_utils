@@ -59,7 +59,7 @@ class Dependency_Structure:
             combine(ds)
         return self
     
-    def __init__(self, source, limit=None, is_file=True,  stop_words=[]):
+    def __init__(self, source, is_file=True, limit=None, stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
 
