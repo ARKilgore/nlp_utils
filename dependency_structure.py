@@ -132,7 +132,11 @@ class Sentence:
         return context
 
     def get_nodes_nohead(self):
- 	return self.nodes[1:]
+	nodes = []
+	for node in self.nodes:
+	    if node.get_form() != None:
+		nodes.append(node)
+	return nodes
 
 class Node:
     def __init__(self):
