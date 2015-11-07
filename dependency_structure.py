@@ -9,18 +9,8 @@ from os.path import isfile, join
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def __init__(self, source, limit=None, is_file=True,  stop_words=[]):
-        # accepts name of tsv file containing dependency parsed corpus
-        # track whether the current word (row) is the start of a new sentence
-
-        if is_file:
-            ds_from_file(source)
-        else:
-            ds_from_dir(source)
-        print 'Created ', len(self.sentences), ' sentences'
-
     def ds_from_dir(self, source):
-        files = [f in listdir(source) if isfile(join(source,f) ]
+        files = [f in listdir(source) if isfile(join(source,f)) ]
         for f in files:
             ds_from_file(f)
 
@@ -67,6 +57,17 @@ class Dependency_Structure:
         for ds in ds_list:
             combine(ds)
         return self
+    
+    def __init__(self, source, limit=None, is_file=True,  stop_words=[]):
+        # accepts name of tsv file containing dependency parsed corpus
+        # track whether the current word (row) is the start of a new sentence
+
+        if is_file:
+            ds_from_file(source)
+        else:
+            ds_from_dir(source)
+        print 'Created ', len(self.sentences), ' sentences'
+
 class Sentence:
     def __init__(self, sentence, stop_words=[]):
 	self.token_list = None
