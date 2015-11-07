@@ -9,12 +9,7 @@ from os.path import isfile, join
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def ds_from_dir(self, source):
-        files = [f in listdir(source) if isfile(join(source,f)) ]
-        for f in files:
-            ds_from_file(f)
-
-    def ds_from_file(self, file_name):
+    def ds_from_file(self, file_name, limit=None):
         last_index = -1
         # structure to hold sentence objects after processing
         self.sentences = []
@@ -41,6 +36,12 @@ class Dependency_Structure:
             if chunk:
                 self.sentences.append(Sentence(chunk))
 
+    def ds_from_dir(self, source, limit):
+	files = [f for f in listdir(source) if isfile(join(source,f)) ]
+        for f in files:
+            self.ds_from_file(join(source + '/',f), limit)
+	    print 'file complete'
+
 
     def get_tokenized_sentences(self):
         return [a.get_token_list() for a in self.sentences]
@@ -63,9 +64,9 @@ class Dependency_Structure:
         # track whether the current word (row) is the start of a new sentence
 
         if is_file:
-            ds_from_file(source)
+            self.ds_from_file(source, limit)
         else:
-            ds_from_dir(source)
+            self.ds_from_dir(source, limit)
         print 'Created ', len(self.sentences), ' sentences'
 
 class Sentence:
