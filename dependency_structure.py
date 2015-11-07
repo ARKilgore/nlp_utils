@@ -1,4 +1,6 @@
 import csv
+from os import listdir
+from os.path import isfile, join
 
 """Loads dependency structure from file, give object-oriented representations"""
 
@@ -7,16 +9,29 @@ import csv
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def __init__(self, file_name, limit=None, stop_words=[]):
+    def __init__(self, source, limit=None, is_file=True,  stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
+
+        if is_file:
+            ds_from_file(source)
+        else:
+            ds_from_dir(source)
+        print 'Created ', len(self.sentences), ' sentences'
+
+    def ds_from_dir(self, source):
+        files = [f in listdir(source) if isfile(join(source,f) ]
+        for f in files:
+            ds_from_file(f)
+
+    def ds_from_file(self, file_name):
         last_index = -1
         # structure to hold sentence objects after processing
         self.sentences = []
         # chunk is a list of the words in the current sentence
         chunk = []
         with open(file_name, "r") as tsv_in:
-	    tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
+            tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
             for row in tsv_in:
                 if not row:
                     if chunk:
@@ -35,7 +50,7 @@ class Dependency_Structure:
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
-        print 'Created ', len(self.sentences), ' sentences'
+
 
     def get_tokenized_sentences(self):
         return [a.get_token_list() for a in self.sentences]
@@ -47,7 +62,11 @@ class Dependency_Structure:
         self.sentences = self.get_sentences() + ds.get_sentences()
         return self
 
-
+    def combine_all(self, ds_list):
+        """Extremely slow, need to optimize"""
+        for ds in ds_list:
+            combine(ds)
+        return self
 class Sentence:
     def __init__(self, sentence, stop_words=[]):
 	self.token_list = None
