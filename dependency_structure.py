@@ -96,6 +96,9 @@ class Sentence:
             h.add_dep(i, n.arc)
         self.nodes = nodes
 
+    def get_node(self, index):
+        return self.nodes[index]
+
     def get_head(self, index):
         return self.nodes[self.nodes[index].get_head_index()]
 
@@ -131,7 +134,7 @@ class Sentence:
 
         return context
 
-    def get_nodes_nohead(self):
+    def get_nodes_nohead(self, node=None):
 	nodes = []
 	for node in self.nodes:
 	    if node.get_form() != None:
