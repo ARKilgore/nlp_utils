@@ -87,6 +87,7 @@ class Sentence:
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) 
             n.set_pos(term[3])
+            n.set_ne_tag(term[9])
 
             if n.head >= len(nodes):
                 print 'ERROR ', i, n.head, n.form
@@ -147,6 +148,7 @@ class Node:
         self.arc = None
         self.form = None
         self.pos = None
+        self.ne_tag = None
         self.dep = []
     
     def set_form(self, form):
