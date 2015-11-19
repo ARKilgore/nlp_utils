@@ -78,11 +78,9 @@ class Sentence:
         nodes = [Node()]
         nodes.extend([Node() for i in range(0, len(sentence))])
         for i, term in enumerate(sentence, 1):
-            print 'term ', i, ' is ', term[1]
 	    if term[1] in stop_words:
 		nodes.remove(nodes[i])
 		continue
-            print 'setting node',i
             n = nodes[i]
             n.set_form(term[1])
             n.set_head(int(term[5]), term[6]) 
