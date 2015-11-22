@@ -16,8 +16,9 @@ class Dependency_Structure:
         # chunk is a list of the words in the current sentence
         chunk = []
         with open(file_name, "r") as tsv_in:
-            tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
-            for row in tsv_in:
+            #tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
+            for row in tsv_in.readlines():
+                row = row.split('\t')
                 if not row:
                     if chunk:
                         self.sentences.append(Sentence(chunk))
@@ -26,6 +27,8 @@ class Dependency_Structure:
                     continue
                 if limit and len(self.sentences) > limit:
                     break
+                if row == ['\n']:
+                    continue
                 if row and int(row[0]) > last_index:
                     last_index = int(row[0])
                     chunk.append(row)
@@ -35,6 +38,8 @@ class Dependency_Structure:
                     chunk = [row]
             if chunk:
                 self.sentences.append(Sentence(chunk))
+
+
 
     def ds_from_dir(self, source, limit):
 	files = [f for f in listdir(source) if isfile(join(source,f)) ]
