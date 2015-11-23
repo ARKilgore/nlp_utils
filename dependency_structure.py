@@ -1,6 +1,7 @@
 import csv
 from os import listdir
 from os.path import isfile, join
+import text_clean as tc
 
 """Loads dependency structure from file, give object-oriented representations"""
 
@@ -47,6 +48,7 @@ class Dependency_Structure:
             self.ds_from_file(join(source + '/',f), limit)
 	    print 'file complete'
 
+    
 
     def get_tokenized_sentences(self):
         return [a.get_token_list() for a in self.sentences]
@@ -116,7 +118,7 @@ class Sentence:
 	    self.token_list = []
 	    for i, word in enumerate(self.nodes):
 		if i != 0 and word.get_form() != None:
-		    self.token_list.append(word.get_form().lower())
+		    self.token_list.append(tc.clean(word.get_form()))
 	return self.token_list
 
     def get_adjacency_context(self, which, window=-1):
