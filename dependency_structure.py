@@ -99,7 +99,7 @@ class Dependency_Structure:
 
         if is_file:
             self.ds_from_file(source, limit)
-        elif: is_text:
+        elif is_text:
             self.ds_from_text(source, limit)
         else:
             self.ds_from_dir(source, limit)
@@ -128,7 +128,7 @@ class Sentence:
                 print sentence
             else:
                 h = nodes[n.head]
-            h.add_dep(i, n.arc)
+                h.add_dep(i, n.arc)
         self.nodes = nodes
 
     def get_node(self, index):
