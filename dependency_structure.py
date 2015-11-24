@@ -10,6 +10,33 @@ import text_clean as tc
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
+    def ds_from_text(self, sentences, limit=None):
+        chunk = []
+        last_index = -1
+        self.sentences = []
+        for row in sentences:
+            row = row.split('\t')
+            if not row:
+                if chunk:
+                    self.sentences.append(Sentence(chunk))
+                    chunk = []
+                last_index = -1
+                continue
+            if limit and len(self.sentences) > limit:
+                break
+            if row == ['\n']:
+                continue
+            if row and int(row[0]) > last_index:
+                last_index = int(row[0])
+                chunk.append(row)
+            else:
+                self.sentences.append(Sentence(chunk))
+                last_index = -1
+                chunk = [row]
+        if chunk:
+            self.sentences.append(Sentence(chunk))
+
+
     def ds_from_file(self, file_name, limit=None):
         last_index = -1
         # structure to hold sentence objects after processing
@@ -66,12 +93,14 @@ class Dependency_Structure:
             combine(ds)
         return self
     
-    def __init__(self, source, is_file=True, limit=None, stop_words=[]):
+    def __init__(self, source, is_file=True, is_text=False, limit=None, stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
 
         if is_file:
             self.ds_from_file(source, limit)
+        elif: is_text:
+            self.ds_from_text(source, limit)
         else:
             self.ds_from_dir(source, limit)
         print 'Created ', len(self.sentences), ' sentences'
