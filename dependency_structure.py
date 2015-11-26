@@ -84,6 +84,7 @@ class Dependency_Structure:
         for sentence in self.get_tokenized_sentences():
             for word in sentence:
                 words.append(word)
+        return words
 
     def unique(self):
         unique_tokens = {}
