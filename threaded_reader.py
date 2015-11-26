@@ -38,7 +38,7 @@ def t_read(thread_num=100, upper=None, is_build_vocab=False):
 
     print 'gonna make ', min(thread_num, len(files)), ' threads'
     for _ in range(min(thread_num, len(files))):
-        t = Thread(target=reader, args=(qout, qin, build_ds))
+        t = Thread(target=reader, args=(qout, qin, is_build_vocab))
         t.start()
         threads.append(t)
         qout.put(None)
