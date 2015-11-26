@@ -75,10 +75,22 @@ class Dependency_Structure:
             self.ds_from_file(join(source + '/',f), limit)
 	    print 'file complete'
 
-    
 
     def get_tokenized_sentences(self):
         return [a.get_token_list() for a in self.sentences]
+
+    def get_all_words(self):
+        words = []
+        for sentence in self.get_tokenized_sentences():
+            for word in sentence:
+                words.append(word)
+
+    def unique(self):
+        unique_tokens = {}
+        for token in self.get_all_words():
+            if token not in unique_tokens:
+                unique_tokens[token] = 1
+        return unique_tokens.keys()
 
     def get_sentences(self):
         return self.sentences
