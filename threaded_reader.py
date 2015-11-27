@@ -16,7 +16,9 @@ def reader(qin, qout, is_build_vocab):
         print 'parsing', name
 	lines = open(name, 'r').readlines()
         if is_build_vocab:
-            qout.put(dep.Dependency_Structure(lines).unique_words())
+	    ds = dep.Dependency_Structure(lines, is_file=False, is_text=True)
+            unique_words = ds.unique()
+            qout.put(unique_words)
         else:
             qout.put(lines)
         print 'parsed', name
