@@ -160,7 +160,9 @@ class Sentence:
 	    self.token_list = []
 	    for i, word in enumerate(self.nodes):
 		if i != 0 and word.get_form() != None:
-		    self.token_list.append(tc.clean(word.get_form()))
+                    token = tc.clean(word.get_form())
+                    if token:
+	                self.token_list.append(token)
 	return self.token_list
 
     def get_adjacency_context(self, which, window=-1):
