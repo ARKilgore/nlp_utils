@@ -67,7 +67,7 @@ def main(which='NB'):
 
     global global_features 
     global_features = get_features(get_all_words(training_data))
-    if which='NB':
+    if which == 'NB':
 	    training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
 	    print 'moving to classifier creation'
 	    start = time.clock()
@@ -81,7 +81,7 @@ def main(which='NB'):
 	    while text != 'q':
 		print classifier.classify(extract_features(text.split()))
 		text = raw_input('Next test (q to quit):')
-    elif which='SGD':
+    elif which == 'SGD':
 	training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data)) 
         label_set = [tup[1] for tup in training_data] 
         print label_set
