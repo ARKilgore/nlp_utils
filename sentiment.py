@@ -1,6 +1,6 @@
 import nltk
 from nltk.classify import SklearnClassifier
-from nltk.linear_model import SGDClassifier
+from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import BernoulliNB
 import cPickle as pickle
 import time
