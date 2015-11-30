@@ -83,10 +83,13 @@ def main(which='NB'):
 		text = raw_input('Next test (q to quit):')
     elif which == 'SGD':
 	training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data)) 
-        label_set = [tup[1] for tup in training_data] 
-        print label_set
+        label_set = [tup[1] for tup in training_data]
 	print 'moving to classifier creation'
-	start = time.clock()
+        clf = SGDClassifier(loss="hinge", penalty="l2")
+	print 'moving to training'
+        clf.fit(training_set, label_set)
+	print 'moving to prediction'
+        print clf.predict(extract_features("i hate everything".split()))
         
 
 main(which='SGD')
