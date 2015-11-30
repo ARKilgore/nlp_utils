@@ -1,6 +1,8 @@
 import nltk
 from nltk.classify import SklearnClassifier
 from sklearn.naive_bayes import BernoulliNB
+import cPickle as pickle
+import time
 
 """READING IN FROM FILES"""
 def read_train(source):
@@ -10,13 +12,9 @@ def read_train(source):
     fdata.readline()
     
     phrases = []
-    i = 0
     for data in fdata:
         data = data.split('\t')
         phrases.append(([token.lower().rstrip() for token in data[2].split(' ')],data[3].rstrip()))
-        i += 1
-        if i > 100:
-            break
     return phrases
 
 
@@ -71,9 +69,13 @@ def main():
     
     training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
     print 'moving to classifier creation'
-    #classifier = nltk.NaiveBayesClassifier.train(training_set)
-    classifier = SklearnClassifier(BernoulliNB()).train(training_set)
-    
+    start = time.clock()
+    classifier = nltk.NaiveBayesClassifier.train(training_set)
+    print 'classfier total time: ' str(time.clock() - start)
+    #classifier = SklearnClassifier(BernoulliNB()).train(training_set)
+ 
+    pickle.dump(classifier, open('classifier.pickle', 'w'))
+	   
     text = raw_input('Next test (q to quit):')
     while text != 'q':
         print classifier.classify(extract_features(text.split()))
