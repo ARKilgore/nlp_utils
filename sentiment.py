@@ -1,5 +1,6 @@
 import nltk
 from nltk.classify import SklearnClassifier
+from nltk.linear_model import SGDClassifier
 from sklearn.naive_bayes import BernoulliNB
 import cPickle as pickle
 import time
@@ -61,24 +62,31 @@ def extract_features(doc):
         features['contains(%s)' % word] = (word in words)
     return features
 
-def main():
+def main(which='NB'):
     training_data = read_data(source='dat/train.tsv')
 
     global global_features 
     global_features = get_features(get_all_words(training_data))
-    
-    training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
-    print 'moving to classifier creation'
-    start = time.clock()
-    classifier = nltk.NaiveBayesClassifier.train(training_set)
-    print 'classfier total time: ' str(time.clock() - start)
-    #classifier = SklearnClassifier(BernoulliNB()).train(training_set)
- 
-    pickle.dump(classifier, open('classifier.pickle', 'w'))
-	   
-    text = raw_input('Next test (q to quit):')
-    while text != 'q':
-        print classifier.classify(extract_features(text.split()))
-        text = raw_input('Next test (q to quit):')
+    if which='NB':
+	    training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
+	    print 'moving to classifier creation'
+	    start = time.clock()
+	    classifier = nltk.NaiveBayesClassifier.train(training_set)
+	    print 'classfier total time: ', str(time.clock() - start)
+	    #classifier = SklearnClassifier(BernoulliNB()).train(training_set)
+	 
+	    pickle.dump(classifier, open('classifier.pickle', 'w'))
+		   
+	    text = raw_input('Next test (q to quit):')
+	    while text != 'q':
+		print classifier.classify(extract_features(text.split()))
+		text = raw_input('Next test (q to quit):')
+    elif which='SGD':
+	training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data)) 
+        label_set = [tup[1] for tup in training_data] 
+        print label_set
+	print 'moving to classifier creation'
+	start = time.clock()
+        
 
-main()
+main(which='SGD')
