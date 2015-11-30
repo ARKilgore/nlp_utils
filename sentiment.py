@@ -54,19 +54,26 @@ def get_features(words):
     return features
 
 global_features = {}
+adjectives
 
 def extract_features(doc):
     words = set(doc)
     features = {}
     for word in global_features:
         features['contains(%s)' % word] = (word in words)
+    for adj in adjectives:
+        features['has_adj(%s)' % adj] = (adj in words)
     return features
 
 def main(which='NB'):
     training_data = read_data(source='dat/train.tsv')
 
     global global_features 
+    global adjectives
     global_features = get_features(get_all_words(training_data))
+    with open('adj', 'r') as adj_file:
+        for adj in adj_file:
+            adjectives.append(adj.lower().rstrip())
     if which == 'NB':
 	    training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
 	    print 'moving to classifier creation'
