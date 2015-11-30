@@ -1,21 +1,6 @@
 import numpy as np
 from gensim import models
-
-def cosine_similarity(vector1, vector2):
-    numerator = 0.0
-    v1sum = 0.0
-    v2sum = 0.0
-    point1 = vector1.point
-    point2 = vector2.point
-    for s1, s2 in zip(np.nditer(point1, order='C', flags=['refs_ok']), np.nditer(point2, order='C', flags=['refs_ok'])):
-        numerator += (s1 * s2)
-        v1sum += (s1 * s1)
-        v2sum += (s2 * s2)
-        print 'num is ', numerator, ' s1, s2 are', s1, s2
-    numerator /= v1sum
-    numerator /= v2sum
-    print 'ret ', numerator
-    return numerator 
+from math import sqrt
 
 class Embedding_Similarity:
     def get_word_similarity(self, word1, word2):
@@ -29,8 +14,7 @@ class Embedding_Similarity:
         self.sim_matrix[i][j] = value
         self.sim_matrix[j][i] = value
 
-    def __init__(self, vector_file, term_file, similarity_function=cosine_similarity):
-        self.get_similarity = similarity_function
+    def __init__(self, vector_file, term_file):
         self.vectors = {}
         self.term_to_index = {}
 
@@ -44,7 +28,7 @@ class Embedding_Similarity:
             for term in w:
                 term = term.rstrip()
                 if term in self.vectors:
-                    print 'found ', term
+                    #print 'found ', term
                     self.terms.append(term)
                     self.term_to_index[term] = len(self.terms) - 1
 
@@ -55,7 +39,7 @@ class Embedding_Similarity:
         for i, term1 in enumerate(self.terms):
             for j, term2 in enumerate(self.terms):
 	        print 'comparing ', term1, term2
-	        self.sim_matrix_repeat(i, j, self.get_similarity(self.vectors[term1], self.vectors[term2]))
-	        print term1, term2, ': ', self.get_word_similarity(term1,term2)
+	        self.sim_matrix_repeat(i, j, model.similarity(term1,term2))
+	        #print term1, term2, ': ', self.get_word_similarity(term1,term2)
 	print 'done'
 
