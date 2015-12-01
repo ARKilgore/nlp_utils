@@ -13,21 +13,23 @@ def read_train(source):
     fdata.readline()
     
     phrases = []
+    phrase_to_id = {}
     for data in fdata:
         data = data.split('\t')
         phrases.append(([token.lower().rstrip() for token in data[2].split(' ')],int(data[3].rstrip())))
-    return phrases
+        phrase_to_id[data[2].lower().rstrip()] = data[0]
+    return phrases, id_to_phrase
 
 
 def read_data(source='', which='train'):
 
-    phrases = {
+    phrases, phrase_to_id = {
         'train': read_train,
         'dev': 'dev',   # unimplemented TODO 
         'test': 'test' # unimplemented TODO 
     }[which](source)
 
-    return phrases
+    return phrases, phrase_to_id
     fdata.close()
 
     
@@ -70,20 +72,16 @@ def extract_features(doc):
 
 def main(which='NB'):
     print 'reading training data'
-    training_data = read_data(source='dat/train.tsv')
+    training_data, phrase_to_id = read_data(source='dat/train.tsv')
 
     print 'getting features'
     global global_features 
     global adjectives
     global_features = get_features(get_all_words(training_data))
-<<<<<<< HEAD
     with open('adj', 'r') as adj_file:
         for adj in adj_file:
             adjectives.append(adj.lower().rstrip())
-=======
-    
     print 'entering switch'
->>>>>>> 4ae2f30dbac5b91440a8cf5fe66bd13c54ee3e05
     if which == 'NB':
         training_set = nltk.classify.util.apply_features(extract_features, get_phrase_list(training_data, True)) 
         print 'moving to classifier creation'
