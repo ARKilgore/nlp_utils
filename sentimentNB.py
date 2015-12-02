@@ -22,7 +22,7 @@ def extract_features_dict(text=None, is_raw=False):
     text_set = set(text)
     print 'inner feature extraction'
     for i, word in enumerate(all_words):
-        features[word_feature(i)] = (word in text_set)
+        features[i] = (word in text_set)
     print 'returning dict features'
     return features
 
