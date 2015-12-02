@@ -20,8 +20,10 @@ def extract_features_dict(text=None, is_raw=False):
     word_feature = lambda x: 'contains(%s)' % x
 
     text_set = set(text)
+    print 'inner feature extraction'
     for i, word in enumerate(all_words):
         features[word_feature(i)] = (word in text_set)
+    print 'returning dict features'
     return features
 
 """
@@ -51,10 +53,12 @@ def extract_features_dict(text=None, is_raw=False):
 def use_feature_dicts(train_x):
     train_x_dicts = []
     for x in train_x:
+        print 'extracting dict'
         train_x_dict = extract_features_dict(x, is_raw = True)
         train_x_dicts.append(train_x_dict)
     # print train_x_dicts
     vec = DictVectorizer()
+    print 'transforming...'
     return vec.fit_transform(train_x_dicts)
 
 def word_to_set(phrase_list, is_raw=False):
