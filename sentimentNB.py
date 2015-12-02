@@ -17,12 +17,16 @@ def extract_features_dict(text=None, is_raw=False):
         text = text.split(' ')
 
     features = {}
-    word_feature = lambda x: 'contains(%s)' % x
+    #word_feature = lambda x: 'contains(%s)' % x
 
     text_set = set(text)
     print 'inner feature extraction'
     for i, word in enumerate(all_words):
-        features[i] = (word in text_set)
+	if word in text_set:
+	    features[i] = 1
+        else:
+	    features[i] = 0
+        #features[i] = (word in text_set)
     print 'returning dict features'
     return features
 
@@ -50,11 +54,11 @@ def extract_features_dict(text=None, is_raw=False):
     #         features['contains(%s)' % adjective] = False
 
 
-def use_feature_dicts(train_x):
+def use_feature_dicts(train_x, is_raw = True):
     train_x_dicts = []
     for x in train_x:
         print 'extracting dict'
-        train_x_dict = extract_features_dict(x, is_raw = True)
+        train_x_dict = extract_features_dict(x, is_raw = is_raw)
         train_x_dicts.append(train_x_dict)
     # print train_x_dicts
     vec = DictVectorizer()
@@ -103,7 +107,12 @@ def main():
 
     print 'testing'
     test_x = use_feature_dicts(test['Phrase'])
-    predicted = classifier.predict(test_x)
+    
+    #test_x = raw_input('test...')
+    #while test_x != "q":
+    #    print classifier.predict(use_feature_dicts([test_x], True))
+    #    test_x = raw_input('test...')
+    #return
     for i in predicted:
         print i
     pickle.dump(classifier, open('multinomialNB.pickle', 'w'))
