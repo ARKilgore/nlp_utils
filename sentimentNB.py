@@ -61,7 +61,7 @@ def use_feature_dicts(train_x):
     print 'transforming...'
     return vec.fit_transform(train_x_dicts)
 
-def word_to_set(phrase_list, is_raw=False):
+def word_to_set(phrase_list, is_raw=False, trim = 1):
     words_list = []
     words_count = {}
     for phrase in phrase_list:
@@ -71,7 +71,7 @@ def word_to_set(phrase_list, is_raw=False):
                 words_count[token] += 1
             else:
                 words_count[token] = 1
-            if words_count[token] == 5:
+            if words_count[token] == trim:
                 words_list.append(token)
 
     return list(set(words_list))
