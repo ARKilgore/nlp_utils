@@ -63,8 +63,16 @@ def use_feature_dicts(train_x):
 
 def word_to_set(phrase_list, is_raw=False):
     words_list = []
+    words_count = {}
     for phrase in phrase_list:
-        words_list.extend([word.lower().rstrip() for word in phrase.split()])
+        for word in phrase.split():
+            token = word.lower().rstrip()
+            if token in words_count:
+                words_count[token] += 1
+            else:
+                words_count[token] = 1
+            if words_count[token] == 5:
+                words_list.append(token)
 
     return list(set(words_list))
 
@@ -75,7 +83,7 @@ def main():
     test = pd.read_csv('dat/dev.tsv', sep = '\t')
 
     global all_words
-    all_words = word_to_set(train['Phrase'], True)
+    all_words = word_to_set(train['Phrase'], trim=5, True)
 
     print 'creating x dict vectors from train'
     train_x = train['Phrase']
