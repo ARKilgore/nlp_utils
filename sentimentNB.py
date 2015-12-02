@@ -75,6 +75,7 @@ def main():
 
     print 'creating x dict vectors from train'
     train_x = train['Phrase']
+    print 'extracting...'
     train_x = use_feature_dicts(train_x)
     # print train_x
 
