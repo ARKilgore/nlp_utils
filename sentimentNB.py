@@ -20,14 +20,14 @@ def extract_features_dict(text=None, is_raw=False):
     #word_feature = lambda x: 'contains(%s)' % x
 
     text_set = set(text)
-    print 'inner feature extraction'
+    #print 'inner feature extraction'
     for i, word in enumerate(all_words):
 	if word in text_set:
 	    features[i] = 1
         else:
 	    features[i] = 0
         #features[i] = (word in text_set)
-    print 'returning dict features'
+    #print 'returning dict features'
     return features
 
 """
@@ -57,12 +57,12 @@ def extract_features_dict(text=None, is_raw=False):
 def use_feature_dicts(train_x, is_raw = True):
     train_x_dicts = []
     for x in train_x:
-        print 'extracting dict'
+        #print 'extracting dict'
         train_x_dict = extract_features_dict(x, is_raw = is_raw)
         train_x_dicts.append(train_x_dict)
     # print train_x_dicts
     vec = DictVectorizer()
-    print 'transforming...'
+    #print 'transforming...'
     return vec.fit_transform(train_x_dicts)
 
 def word_to_set(phrase_list, is_raw=False, trim = 1):
@@ -81,21 +81,21 @@ def word_to_set(phrase_list, is_raw=False, trim = 1):
     return list(set(words_list))
 
 def main():
-    print 'getting train'
+    #print 'getting train'
     train = pd.read_csv('dat/train.tsv',sep = '\t')
-    print 'getting test'
+    #print 'getting test'
     test = pd.read_csv('dat/dev.tsv', sep = '\t')
 
     global all_words
-    all_words = word_to_set(train['Phrase'], trim=5, True)
+    all_words = word_to_set(train['Phrase'], trim=20, is_raw=True)
 
-    print 'creating x dict vectors from train'
+    #print 'creating x dict vectors from train'
     train_x = train['Phrase']
-    print 'extracting...'
-    train_x = use_feature_dicts(train_x)
+    #print 'extracting...'
+#    train_x = use_feature_dicts(train_x)
     # print train_x
 
-    print 'creating train y'
+    #print 'creating train y'
     train_y = [int(y) for y in train['Sentiment']]
     # print train_y
 
@@ -107,13 +107,14 @@ def main():
     # # print 'trainsform train x'
     # # test_vectors = tfidf_vectorizer.transform(train_vectors)
     # classifier = MultinomialNB().fit(train_vectors, train['Sentiment'])
-    print 'classifying'
-    classifier = MultinomialNB().fit(train_x, train_y)
+    #print 'classifying'
+#    classifier = MultinomialNB().fit(train_x, train_y)
+    classifier = pickle.load(open('multinomialNB.pickle','r'))
     
     # x_test_counts = count_vector.transform(test['Phrase'])
     # test_vector = tfidf_vectorizer.transform(x_test_counts)
 
-    print 'testing'
+    #print 'testing'
     test_x = use_feature_dicts(test['Phrase'])
     
     #test_x = raw_input('test...')
@@ -121,7 +122,7 @@ def main():
     #    print classifier.predict(use_feature_dicts([test_x], True))
     #    test_x = raw_input('test...')
     #return
-    for i in predicted:
+    for i in classifier.predict(test_x):
         print i
     pickle.dump(classifier, open('multinomialNB.pickle', 'w'))
 
