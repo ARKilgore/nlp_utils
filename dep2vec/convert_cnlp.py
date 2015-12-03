@@ -17,10 +17,11 @@ def convert(fname):
         out = csv.writer(out, delimiter='\t', quotechar='\x07')
         for i, row in enumerate(f):
             if not row:
-                out.write([])
+                out.writerow([])
                 continue
-            row = itemgetter(*cols)(row)
-            out.write(row)
+            row = list(itemgetter(*cols)(row))
+            row[-1] = row[-1].rstrip()
+            out.writerow(row)
     os.remove(fname)
 
 def convert_worker(jobs):
@@ -45,4 +46,4 @@ def convert_all(threads=100):
         ps.append(p)
 
     [p.start() for p in ps]
-
+convert('nyt_000_sentences.cnlp')

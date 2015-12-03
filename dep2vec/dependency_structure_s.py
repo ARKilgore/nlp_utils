@@ -22,11 +22,14 @@ class Dependency_Structure:
                     chunk = []
                 last_index = -1
                 continue
+            
+            # Just for testing
             if limit and len(self.sentences) > limit:
                 break
-            if row == ['\n']:
+
+            if not row or len(row) < 1:
                 continue
-            if row and int(row[0]) > last_index:
+            if int(row[0]) > last_index:
                 last_index = int(row[0])
                 chunk.append(row)
             else:
@@ -53,10 +56,16 @@ class Dependency_Structure:
                         chunk = []
                     last_index = -1
                     continue
+                
+                # TESTING ONLY
                 if limit and len(self.sentences) > limit:
                     break
-                if row == ['\n']:
+                #
+
+
+                if not row or len(row) <= 1:
                     continue
+                print row, len(row)
                 if row and int(row[0]) > last_index:
                     last_index = int(row[0])
                     chunk.append(row)
@@ -64,6 +73,7 @@ class Dependency_Structure:
                     self.sentences.append(Sentence(chunk))
                     last_index = -1
                     chunk = [row]
+                    print 'break chunk here'
             if chunk:
                 self.sentences.append(Sentence(chunk))
 
