@@ -8,13 +8,13 @@ prewiki = '/data/mnt/ainos-research/corpus/wikipedia2015/tree/*.cnlp'
 
 
 def reader(jobs, out):
-    index, name = jobs.get()
+    name = jobs.get()
     
     while name != None:
-        print 'parsing', name[10:]
+        print 'parsing', name[20:]
         with open(name, 'r') as f:
             lines = f.readlines()
-        out.set(index, lines)
+        out.put(lines)
         
         print 'parsed', name
         name = jobs.get()
@@ -22,7 +22,7 @@ def reader(jobs, out):
 
 def t_read(thread_num=100, upper=None):
     jobs = Queue()
-    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    results = Queue()
     processes = []
 
     files = []
@@ -33,24 +33,26 @@ def t_read(thread_num=100, upper=None):
     if upper:
 	files = files[:upper]
 
-    for i, f in enumerate(files):
-        jobs.put((i, f))
-    print 'there are ', i, ' files'
+    for f in files:
+        jobs.put(f)
 
     start = clock()
 
     print 'gonna make ', min(thread_num, len(files)), ' threads'
 
     for _ in range(min(thread_num, len(files))):
-        p = Process(target=reader, args=(jobs, r))
+        p = Process(target=reader, args=(jobs, results))
         p.start()
         processes.append(p)
         jobs.put(None)
 
-    for p in processes:
-        p.join()
+    text = []
+    for _ in files:
+        text.extend(results.get())
 
     
-    print 'total time:', str( time.clock() - start )
+    print 'total time:', str(clock() - start )
     print 'returning text', len(text)
-    return r, len(files)
+    return text
+
+print t_read()
