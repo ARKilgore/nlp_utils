@@ -1,48 +1,50 @@
 from gensim.models import Word2Vec
-import threaded_reader as tr
-import dependency_structure as dep
+from nlp_utils.dep2vec import threaded_reader as tr
+from nlp_utils.dep2vec import dependency_structure_s as dep
 from time import clock
-from buildVocab import build_vocab
+from multiprocessing import Process
 import glob
-from threading import Thread
-from Queue import Queue
 
+prenyt = '/data/mnt/ainos-research/corpus/nytimes/tree/*.snlp'
+prewiki = '/data/mnt/ainos-research/corpus/wikipedia2015/tree/*.snlp'
+
+nyt = glob.glob(prenyt)
+wiki = glob.glob(prewiki)
+
+file_lists = []
+lower = 0
+incr = 17
+upper = incr
+def chunker(flist, lower, upper, incr):
+    file_lists = []
+    while upper < len(flist):
+        file_lists.append(flist[lower:upper])
+        lower += incr
+        upper += incr
+    else:
+        file_lists.append(flist[lower:])
+    return file_lists
+file_lists.extend(chunker(nyt, lower, upper, incr))
+file_lists.extend(chunker(wiki, lower, upper, incr))
+print len(file_lists)
+
+#file_lists = [nyt1, nyt2, wiki1, wiki2, wiki3, wiki4, wiki5]
+#file_lists = [[file_lists[0]]]
+model = Word2Vec.load('vectors.baseline')
 """Build Vocab"""
 start = clock()
-text = tr.t_read(thread_num=100, is_build_vocab=True)
-print 'total read time: ', str(clock() - start)
-print 'done reading'
-#ds = dep.Dependency_Structure(text, is_file=False, is_text=True)
-model = Word2Vec(text, workers=16)
-# model.build_vocab(text)
-print 'total v build time: ', str(clock() - start)
-
-"""Generate dep_structures from threads, train as they finish"""
-#start = clock()
-#threads = []
-#files = ['nyt_000_sentences.cnlp']
-##files.extend(glob.glob('/data/mnt/ainos-research/corpus/nytimes/tree/*.cnlp'))
-##files.extend(glob.glob('/data/mnt/ainos-research/corpus/wikipedia2015/tree/*.cnlp'))
-#
-#qin = Queue()
-#qout = Queue()
-#
-#for f in files:
-#    qout.put(f)
-#
-#for i in range(min(100, len(files))):
-#    t = Thread(target=tr.reader, args=(qout, qin, False, True))
-#    t.start()
-#    threads.append(t)
-#    qout.put(None)
-#
-#for _ in range(len(files)):
-#    ds = qin.get()
-#    model.train(ds.get_tokenized_sentences)
-#
-#for t in threads:
-#    t.join()
-
-print 'word2vec, 16 workers, total time: ', str(clock() - start)
-model.save('vectors.out.onetest')
+for i, fileset in enumerate(file_lists):
+    print 'working on ', len(fileset), ' files'
+    text = tr.t_read(30, files=fileset) 
+    print 'total read time: ', str(clock() - start)
+    print 'done reading'
+    ds = dep.Dependency_Structure(text, is_file=False, is_text=True)
+    print 'total v build time: ', str(clock() - start)
+    
+    start = clock()
+    model.train(dep.Dependency_Structure(text, is_file=False, is_text=True).get_tokenized_sentences())
+    
+    print 'word2vec, total time: ', str(clock() - start)
+    fname = '/data/vectors.' + str(i)
+    model.save(fname)
 
