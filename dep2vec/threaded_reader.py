@@ -20,13 +20,14 @@ def reader(jobs, out):
         name = jobs.get()
     print 'dead'
 
-def t_read(thread_num=100, upper=None):
+def t_read(thread_num=100, upper=None, files=None):
     jobs = Queue()
     results = Queue()
     processes = []
-
-    files = []
-    files = ['nyt_000_sentences.cnlp']
+    
+    #if not files:
+    #    files = []
+    #    files = ['nyt_000_sentences.cnlp']
 #    files.extend(glob.glob(prenyt))
 #    files.extend(glob.glob(prewiki))
 
@@ -55,4 +56,3 @@ def t_read(thread_num=100, upper=None):
     print 'returning text', len(text)
     return text
 
-print t_read()
