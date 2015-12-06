@@ -196,7 +196,7 @@ class Sentence:
         return self.nodes[self.nodes[index].get_head_index()]
 
     def get_siblings(self, index):
-        if self.nodes[i].get_head_index() is -1:
+        if self.nodes[index].get_head_index() is -1:
             return []
         return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
 
