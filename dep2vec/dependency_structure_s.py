@@ -227,6 +227,9 @@ class Node:
     def get_form(self):
         return self.form
 
+    def get_token(self):
+        return tc.clean(self.get_form())
+
     def add_dep(self, index, arc_type):
         self.dep.append((index, arc_type))
 
