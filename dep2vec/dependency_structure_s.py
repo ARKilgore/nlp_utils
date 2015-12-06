@@ -25,56 +25,54 @@ class Dependency_Structure:
         chunk = []
         last_index = -1
         self.sentences = []
-        jobs = Queue()
-        out = Queue()
-        ps = []
-        for _ in range(30):
-            p = Process(target = make_sentence, args=(jobs, out))
-            ps.append(p)
-            p.start()
-
+       # ps = []
+       # for _ in range(30):
+       #     p = Process(target = make_sentence, args=(jobs, out))
+       #     ps.append(p)
+       #     p.start()
+        last = 0
         for i, row in enumerate(sentences):
-            print str(float(i)/float(len(sentences))) , '% ds text parsed'
+            if i > last * 2:
+                print str(float(i)/float(len(sentences))) , '% ds text parsed'
+                last = i
             row = row.split('\t')
             if not row:
                 if chunk:
-                    jobs.put(chunk)
                     sents += 1
-                    #self.sentences.append(Sentence(chunk))
+                    self.sentences.append(Sentence(chunk))
                     chunk = []
                 last_index = -1
                 continue
             
             # Just for testing
-            if limit and len(self.sentences) > limit:
-                break
+            #if limit and len(self.sentences) > limit:
+            #    break
 
-            if not row or len(row) <= 1 or not row[0].isdigit():
+            elif len(row) <= 1 or not row[0].isdigit():
                 if chunk:
-                    jobs.put(chunk)
+                    #jobs.put(chunk)
                     sents += 1
-                    #self.sentences.append(Sentence(chunk))
+                    self.sentences.append(Sentence(chunk))
                     last_index = -1
                     chunk = []
                 continue
-            if int(row[0]) > last_index:
+            elif int(row[0]) > last_index:
                 last_index = int(row[0])
                 chunk.append(row)
             else:
-                jobs.put(chunk)
                 sents += 1
-                #self.sentences.append(Sentence(chunk))
+                self.sentences.append(Sentence(chunk))
                 last_index = -1
                 chunk = [row]
         if chunk:
-            jobs.put(chunk)
+            self.sentences.append(Sentence(chunk))
             sents += 1
             #self.sentences.append(Sentence(chunk))
-        for i, _ in enumerate(range(sents)):
-            print str(float(i)/float(sents)) , '% ds threads parsed'
-            self.sentences.append(out.get())
-        for p in ps:
-            p.join()
+#        for i, _ in enumerate(range(sents)):
+#            print str(float(i)/float(sents)) , '% ds threads parsed'
+#            self.sentences.append(out.get())
+#        for p in ps:
+#            p.join()
 
 
     def ds_from_file(self, file_name, limit=None):
@@ -226,7 +224,8 @@ class Sentence:
         # temporary filler
         context = []
         # dependency features
-        context.append(self.get_head(which))
+        if self.nodes[which].get_head_index() is not -1:
+	    context.append(self.get_head(which))
         context.extend(self.get_siblings(which))
 
         return context
