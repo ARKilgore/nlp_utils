@@ -1,7 +1,6 @@
 import glob
 from time import sleep, clock
 from multiprocessing import Process, Queue
-import redis
 
 prenyt = '/data/mnt/ainos-research/corpus/nytimes/tree/*.cnlp'
 prewiki = '/data/mnt/ainos-research/corpus/wikipedia2015/tree/*.cnlp'
@@ -48,9 +47,11 @@ def t_read(thread_num=100, upper=None, files=None):
         jobs.put(None)
 
     text = []
-    for _ in files:
+    for f in files:
         text.extend(results.get())
-
+        print 'got ', f
+    for p in processes:
+        p.join()
     
     print 'total time:', str(clock() - start )
     print 'returning text', len(text)

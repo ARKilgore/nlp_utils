@@ -2,6 +2,7 @@ import csv
 from os import listdir
 from os.path import isfile, join
 import text_clean as tc
+from multiprocessing import Process, Queue
 
 """Loads dependency structure from file, give object-oriented representations"""
 
@@ -9,16 +10,37 @@ import text_clean as tc
 # Sentences (node-based structure) can be accessed through Dependency_Structure.
 # Most functionality to examine specfic structure and relations will happen at this level.
 
+def make_sentence(jobs, out):
+    text = jobs.get()
+    while text != None:
+        out.put(Sentence(text))
+        text = jobs.get()
+    print 'make sent ending'
+    return
+
 class Dependency_Structure:
     def ds_from_text(self, sentences, limit=None):
+        sents = 0
+        print 'Making sentences'
         chunk = []
         last_index = -1
         self.sentences = []
-        for row in sentences:
+        jobs = Queue()
+        out = Queue()
+        ps = []
+        for _ in range(30):
+            p = Process(target = make_sentence, args=(jobs, out))
+            ps.append(p)
+            p.start()
+
+        for i, row in enumerate(sentences):
+            print str(float(i)/float(len(sentences))) , '% ds text parsed'
             row = row.split('\t')
             if not row:
                 if chunk:
-                    self.sentences.append(Sentence(chunk))
+                    jobs.put(chunk)
+                    sents += 1
+                    #self.sentences.append(Sentence(chunk))
                     chunk = []
                 last_index = -1
                 continue
@@ -27,17 +49,32 @@ class Dependency_Structure:
             if limit and len(self.sentences) > limit:
                 break
 
-            if not row or len(row) < 1:
+            if not row or len(row) <= 1 or not row[0].isdigit():
+                if chunk:
+                    jobs.put(chunk)
+                    sents += 1
+                    #self.sentences.append(Sentence(chunk))
+                    last_index = -1
+                    chunk = []
                 continue
             if int(row[0]) > last_index:
                 last_index = int(row[0])
                 chunk.append(row)
             else:
-                self.sentences.append(Sentence(chunk))
+                jobs.put(chunk)
+                sents += 1
+                #self.sentences.append(Sentence(chunk))
                 last_index = -1
                 chunk = [row]
         if chunk:
-            self.sentences.append(Sentence(chunk))
+            jobs.put(chunk)
+            sents += 1
+            #self.sentences.append(Sentence(chunk))
+        for i, _ in enumerate(range(sents)):
+            print str(float(i)/float(sents)) , '% ds threads parsed'
+            self.sentences.append(out.get())
+        for p in ps:
+            p.join()
 
 
     def ds_from_file(self, file_name, limit=None):
