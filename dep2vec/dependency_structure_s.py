@@ -191,14 +191,21 @@ class Sentence:
 
     def get_node(self, index):
         return self.nodes[index]
+    
+    def get_siblings(self, index):
+        if self.nodes[index].get_head_index() is None:
+            return []
+        return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
+
+
+    def get_sibling_nodes(self, index):
+        siblings = self.get_siblings(index)
+        snodes = []
+        for sibling in siblings:
+            snodes.append(self.get_node(sibling[0]))
 
     def get_head(self, index):
         return self.nodes[self.nodes[index].get_head_index()]
-
-    def get_siblings(self, index):
-        if self.nodes[index].get_head_index() is -1:
-            return []
-        return self.nodes[self.nodes[index].get_head_index()].get_dep_list()
 
     def get_token_list(self):
 	if not self.token_list:
@@ -226,7 +233,7 @@ class Sentence:
         # dependency features
         if self.nodes[which].get_head_index() is not None:
 	    context.append(self.get_head(which))
-        context.extend(self.get_siblings(which))
+        context.extend([sibling[0] for sibling in self.get_sibling_nodes(which)])
 
         return context
 
