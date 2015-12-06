@@ -224,7 +224,7 @@ class Sentence:
         # temporary filler
         context = []
         # dependency features
-        if self.nodes[which].get_head_index() is not -1:
+        if self.nodes[which].get_head_index() is not None:
 	    context.append(self.get_head(which))
         context.extend(self.get_siblings(which))
 
