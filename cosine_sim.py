@@ -42,4 +42,4 @@ class Embedding_Similarity:
 	        self.sim_matrix_repeat(i, j, model.similarity(term1,term2))
 	        #print term1, term2, ': ', self.get_word_similarity(term1,term2)
 	print 'done'
-
+    np.savetxt("sim_matrix.csv", self.sim_matrix, delimiter="\t")
