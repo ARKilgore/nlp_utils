@@ -105,6 +105,43 @@ class Dependency_Structure:
         for ds in ds_list:
             combine(ds)
         return self
+
+    def first_order_dep(self, sent):
+        return sent.get_dependency_contexts('dep1')
+
+    def first_second_order_dep(self, sent):
+        return sent.get_dependency_contexts('dep2')
+
+    def first_order_dep_h(self, sent):
+        return sent.get_dependency_contexts('dep1h')
+
+    def first_second_order_dep_h(self, sent):
+        return sent.get_dependency_contexts('dep2h')
+
+    def first_sib_dep(self, sent):
+        return sent.get_dependency_contexts('sib1dep1')
+
+    def first_sib_dep_h(self, sent):
+        return sent.get_dependency_contexts('sib1dep1h')
+
+    def semantic_head(self, sent):
+        return sent.get_dependency_contexts('srl')
+
+    def get_context_size(self, context):
+        get_contexts = { 'dep1'      :self.first_order_dep,
+                        'dep2'      :self.first_second_order_dep,
+                        'dep1h'     :self.first_order_dep_h,
+                        'dep2h'     :self.first_second_order_dep_h,
+                        'dep1sib1'  :self.first_sib_dep,
+                        'dep1sib1h' :self.first_sib_dep_h,
+                        'srl'       :self.semantic_head
+                        }[context]
+        word_c = 0
+        for sent in self.sentences:
+            word_c += len(sent.nodes)
+            for context in get_contexts():
+                count += len(context)
+        return (word_c, count)
     
     def __init__(self, source, is_file=True, is_text=False, limit=None, stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
@@ -175,14 +212,27 @@ class Sentence:
                     context_words.append[self.nodes[i]]
             return context_words
 
-    def get_dependency_context(self, which, window=-1):
-        # temporary filler
-        context = []
-        # dependency features
-        context.append(self.get_head(which))
-        context.extend(self.get_siblings(which))
+    def get_dependency_context(self, word, context_type):
+        if context_type == 'dep1':
+            context = word.get_dep_list()
+        elif context_type == 'dep1h':
+            context = word.get_dep_list()
+            context.append(word.get_head_index())
+        elif context_type == 'sib1dep1':
+            pass
+        elif context_type == 'sib1dep1h':
+            pass
+        elif context_type == 'siball':
+            pass
+        elif context_type == 'srl':
+            pass
 
         return context
+
+    def get_dependency_contexts(self, context_type):
+        contexts = []
+        for word in self.nodes:
+            contexts.append(self.get_dependency_context(word, context_type))
 
     def get_nodes_nohead(self, node=None):
 	nodes = []
