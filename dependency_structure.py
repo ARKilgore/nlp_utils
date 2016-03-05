@@ -10,15 +10,15 @@ import text_clean as tc
 # Most functionality to examine specfic structure and relations will happen at this level.
 
 class Dependency_Structure:
-    def ds_from_text(self, sentences, limit=None):
+    def _chunk_builder(self, source, limit=None):
         chunk = []
         last_index = -1
         self.sentences = []
-        for row in sentences:
+        for i, row in enumerate(source):
             row = row.split('\t')
             if not row:
                 if chunk:
-                    self.sentences.append(Sentence(chunk))
+                    yield chunk
                     chunk = []
                 last_index = -1
                 continue
@@ -30,51 +30,29 @@ class Dependency_Structure:
                 last_index = int(row[0])
                 chunk.append(row)
             else:
-                self.sentences.append(Sentence(chunk))
+                yield chunk
                 last_index = -1
                 chunk = [row]
         if chunk:
+            yield chunk
+
+    def ds_from_text(self, sentences, limit=None):
+        print 'processing from text'
+        for chunk in self._chunk_build(sentences, limit):
             self.sentences.append(Sentence(chunk))
 
-
     def ds_from_file(self, file_name, limit=None):
-        last_index = -1
-        # structure to hold sentence objects after processing
-        self.sentences = []
-        # chunk is a list of the words in the current sentence
-        chunk = []
-        with open(file_name, "r") as tsv_in:
-            #tsv_in = csv.reader(tsv_in,delimiter='\t', quotechar='\x07')
-            for row in tsv_in.readlines():
-                row = row.split('\t')
-                if not row:
-                    if chunk:
-                        self.sentences.append(Sentence(chunk))
-                        chunk = []
-                    last_index = -1
-                    continue
-                if limit and len(self.sentences) > limit:
-                    break
-                if row == ['\n']:
-                    continue
-                if row and int(row[0]) > last_index:
-                    last_index = int(row[0])
-                    chunk.append(row)
-                else:
-                    self.sentences.append(Sentence(chunk))
-                    last_index = -1
-                    chunk = [row]
-            if chunk:
-                self.sentences.append(Sentence(chunk))
-
-
+        print 'processing from file'
+        f = open(file_name, 'r')
+        self.ds_from_text(f, limit)
+        f.close
 
     def ds_from_dir(self, source, limit):
+        print 'processing from dir'
 	files = [f for f in listdir(source) if isfile(join(source,f)) ]
         for f in files:
             self.ds_from_file(join(source + '/',f), limit)
 	    print 'file complete'
-
 
     def get_tokenized_sentences(self):
         return [a.get_token_list() for a in self.sentences]
@@ -127,7 +105,42 @@ class Dependency_Structure:
     def semantic_head(self, sent):
         return sent.get_dependency_contexts('srl')
 
-    def get_context_size(self, context):
+    def write_data_tuple(self, fp, tup):
+        map(lambda x: fp.write(str(x) + ' '), tup)
+        fp.write('\n')
+    
+    def write_data_tuple_list(self, fp, t_list):
+        for t in t_list:
+            self.write_data_tuple(fp, t)
+
+
+    def context_analysis(self, source, context_type='dep1'):
+        # assuming dep1 for now
+        data = []
+        fp = open('context_data_' + context_type + '.dat', 'w')
+        # header write
+        fp.write('w_index form POS context_word_index context_arc context_length\n')
+
+        for chunk in self._chunk_builder(source, None):
+            if len(data) > 100:
+                self.write_data_tuple_list(fp, data)
+                data = []
+            sent = Sentence(chunk)
+            contexts =  None
+            contexts =  sent.get_dependency_contexts(context_type)
+            if not contexts:
+                continue
+            for i, context in enumerate(contexts):
+                if sent.nodes[i] == None:
+                    continue
+                # word index, form of contet, POS, index of context, arc of context, length of context
+                for elem in context:
+                    data.append( (i, elem[0], sent.nodes[int(elem[1])].pos, elem[1], elem[2], len(context)) )
+
+        return 'context_data_'+context_type+'.dat'
+
+
+    def ___context_analysis(self, context):
         get_contexts = { 'dep1'      :self.first_order_dep,
                         'dep2'      :self.first_second_order_dep,
                         'dep1h'     :self.first_order_dep_h,
@@ -136,14 +149,24 @@ class Dependency_Structure:
                         'dep1sib1h' :self.first_sib_dep_h,
                         'srl'       :self.semantic_head
                         }[context]
-        word_c = 0
-        for sent in self.sentences:
-            word_c += len(sent.nodes)
-            for context in get_contexts():
+        data = []
+        for i,sent in enumerate(self.sentences):
+            for i, context in enumerate(get_contexts()):
+                print float(i) / float(len(self.sentences))
+                if sent.nodes[i] == None:
+                    continue
+                # word index, form of contet, POS, index of context, arc of context, length of context
+                for elem in context:
+                    data.append( (i, elem[0], self.nodes[elem[0]].pos, elem[1], elem[2], len(context)) )
+                
+                # Index list
+                # Context size
+                # Sentence size
+                # Context words and POS
                 count += len(context)
-        return (word_c, count)
+        return data
     
-    def __init__(self, source, is_file=True, is_text=False, limit=None, stop_words=[]):
+    def __init__(self, source, is_file=True, is_text=False, is_context_analysis=False, limit=None, stop_words=[]):
         # accepts name of tsv file containing dependency parsed corpus
         # track whether the current word (row) is the start of a new sentence
 
@@ -151,6 +174,8 @@ class Dependency_Structure:
             self.ds_from_file(source, limit)
         elif is_text:
             self.ds_from_text(source, limit)
+        elif is_context_analysis:
+            self.context_data = self.context_analysis(source)
         else:
             self.ds_from_dir(source, limit)
         print 'Created ', len(self.sentences), ' sentences'
@@ -213,11 +238,19 @@ class Sentence:
             return context_words
 
     def get_dependency_context(self, word, context_type):
+        # Returns list of (wordform, index, arc)
         if context_type == 'dep1':
             context = word.get_dep_list()
+            full_context = []
+            for pair in context:
+                t = (self.nodes[pair[0]].form, pair[0], pair[1])
+                full_context.append(t)
+            context = full_context
         elif context_type == 'dep1h':
             context = word.get_dep_list()
             context.append(word.get_head_index())
+            for pair in context:
+                full_context.append( (self.nodes[pair[0]].form, pair[0], pair[1]) )
         elif context_type == 'sib1dep1':
             pass
         elif context_type == 'sib1dep1h':
@@ -233,6 +266,7 @@ class Sentence:
         contexts = []
         for word in self.nodes:
             contexts.append(self.get_dependency_context(word, context_type))
+        return contexts
 
     def get_nodes_nohead(self, node=None):
 	nodes = []
@@ -284,3 +318,5 @@ class Node:
             return True
         else:
             return False
+
+
