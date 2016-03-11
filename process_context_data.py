@@ -24,7 +24,7 @@ with open(sys.argv[1], 'r') as fpi, open(sys.argv[2], 'w') as fpo:
                 outside_indices[cdx] += 1
             else:
                 outside_indices[cdx] = 1
-    fpo.write('total inside outside')
+    fpo.write('total inside outside\n')
     fpo.write(str(inside_count+outside_count) + ' ' + str(inside_count) + ' ' + str(outside_count) + '\n')
     map(lambda (i, count): fpo.write(str(i)+':'+str(count)+' ', outside_indices.iteritems()))
 
