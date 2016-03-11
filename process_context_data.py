@@ -11,9 +11,10 @@ with open(sys.argv[1], 'r') as fpi, open(sys.argv[2], 'w') as fpo:
     outside_count = 0
     inside_count = 0
     for line in fpi:
-        idx _ _ cdx _ _ _ = line.split(' ')
+        idx, _, _, cdx, _, _, _ = line.split(' ')
         idx = int(idx)
         cdx = int(cdx)
+        
         # Outside
         if cdx < idx - window_size or cdx > idx + window_size:
             inside_count += 1
